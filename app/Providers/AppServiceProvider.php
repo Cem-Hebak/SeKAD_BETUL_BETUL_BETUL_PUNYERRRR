@@ -1,24 +1,19 @@
 <?php
 
-namespace App\Providers;
-
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Session;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
+    public function boot()
     {
-        //
-    }
+        // Ensure unique IDs for MongoDB sessions
+        Session::extend('mongodb', function ($app) {
+            $connection = $app['db']->connection(config('session.connection'));
+            $table = config('session.table');
 
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
-    {
-        //
+            return new \MongoDB\SessionHandler($connection->getMongoDB(), $table);
+        });
     }
 }
+
